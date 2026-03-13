@@ -5,7 +5,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/penguinlord-2701/DevSecOps_project.git'
+                git branch: 'main', url: 'https://github.com/penguinlord-2701/DevSecOps_project.git'
+
             }
         }
 
