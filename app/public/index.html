@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DevSecOps Learning Portal</title>
+<style>
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+}
+
+h1{
+margin-top:40px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+margin:20px;
+border-radius:10px;
+width:300px;
+display:inline-block;
+}
+
+.card h3{
+color:#38bdf8;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DevSecOps Learning Topics</h1>
+
+<div id="topics"></div>
+
+<script>
+
+fetch("/api/topics")
+.then(res => res.json())
+.then(data => {
+
+const container = document.getElementById("topics");
+
+data.forEach(topic => {
+
+container.innerHTML += `
+<div class="card">
+<h3>${topic.title}</h3>
+<p>${topic.description}</p>
+</div>
+`;
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
