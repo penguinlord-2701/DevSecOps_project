@@ -1,5 +1,6 @@
 pipeline {
 agent any
+
 environment {
     AWS_ACCESS_KEY_ID = credentials('aws-access-key')
     AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
@@ -22,7 +23,7 @@ stages {
 
     stage('3 - Build Docker Image') {
         steps {
-            sh 'docker build -t devsecops-node .'
+            sh 'docker build -t devsecops-app .'
         }
     }
 
