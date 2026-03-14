@@ -1,6 +1,7 @@
 pipeline {
 agent any
 
+
 environment {
     AWS_ACCESS_KEY_ID = credentials('aws-access-key')
     AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
@@ -15,39 +16,42 @@ stages {
         }
     }
 
-    stage('2 - Install Dependencies') {
-        steps {
-            sh 'npm install --prefix app'
-        }
-    }
-
-    stage('3 - Build Docker Image') {
+    stage('2 - Build Docker Image') {
         steps {
             sh 'docker build -t devsecops-app .'
         }
     }
 
-    stage('4 - Infrastructure Security Scan (Trivy)') {
+    stage('3 - Infrastructure Security Scan (Trivy)') {
         steps {
             sh 'trivy config terraform/'
         }
     }
 
-    stage('5 - Terraform Init') {
+    stage('4 - Terraform Init') {
         steps {
             sh 'terraform -chdir=terraform init'
         }
     }
 
-    stage('6 - Terraform Plan') {
+    stage('5 - Terraform Plan') {
         steps {
             sh 'terraform -chdir=terraform plan'
         }
     }
 
-    stage('7 - Deploy Application Container') {
+    stage('6 - Deploy Application Container') {
         steps {
-            sh 'docker run -d -p 3000:3000 devsecops-node || true'
+            sh '''
+            docker rm -f devsecops-container || true
+            docker run -d --name devsecops-container -p 3000:3000 devsecops-app
+            '''
+        }
+    }
+
+    stage('7 - Verify Deployment') {
+        steps {
+            sh 'docker ps'
         }
     }
 
