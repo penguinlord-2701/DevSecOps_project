@@ -44,7 +44,7 @@ stages {
     steps {
         sh '''
         ssh -o StrictHostKeyChecking=no \
-        -i /home/penguinlord/security.pem \
+        -i /var/lib/jenkins/security.pem \
         ec2-user@18.212.253.97 << EOF
 
         cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
