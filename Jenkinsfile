@@ -43,22 +43,29 @@ stages {
    stage('6 - Deploy on EC2') {
     steps {
         sh '''
-        ssh -o StrictHostKeyChecking=no \
-        -i /var/lib/jenkins/security.pem \
-        ec2-user@18.212.253.97 <<'EOF'
-
-        ls ||cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
-        cd DevSecOps_project
-
+        ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/security.pem ec2-user@18.212.253.97 "
+        
+        # Stop & remove old container (if exists)
         docker rm -f devsecops-container || true
-        docker build -t devsecops-app .
-        docker run -d --restart unless-stopped -p 3000:3000 devsecops-app
 
-        EOF
+        # Get latest code (optional but recommended)
+        cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
+        cd DevSecOps_project
+        git pull
+
+        # Build new image
+        docker build -t devsecops-app .
+
+        # Run container with fixed name + restart policy
+        docker run -d \
+          --name devsecops-container \
+          --restart unless-stopped \
+          -p 3000:3000 \
+          devsecops-app
+        "
         '''
     }
 }
-
     stage('7 - Verify Deployment') {
         steps {
             sh 'docker ps'
