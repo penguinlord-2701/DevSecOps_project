@@ -44,19 +44,28 @@ stages {
     steps {
         sh '''
         ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/security.pem ec2-user@18.212.253.97 "
-        
-        # Stop & remove old container (if exists)
-        docker rm -f devsecops-container || true
 
-        # Get latest code (optional but recommended)
-        cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
+        # Stop ALL containers using port (fix port conflict)
+        docker rm -f $(docker ps -aq) || true
+
+        # Remove old image (optional clean)
+        docker rmi devsecops-app || true
+
+        # Clone repo if not exists
+        if [ ! -d DevSecOps_project ]; then
+            git clone https://github.com/penguinlord-2701/DevSecOps_project.git
+        fi
+
+        # Enter project directory
         cd DevSecOps_project
+
+        # Pull latest changes
         git pull
 
         # Build new image
         docker build -t devsecops-app .
 
-        # Run container with fixed name + restart policy
+        # Run container properly
         docker run -d \
           --name devsecops-container \
           --restart unless-stopped \
