@@ -40,12 +40,16 @@ stages {
         }
     }
 
-    stage('6 - Deploy Application Container') {
-        steps {
-            sh '''
-            docker rm -f devsecops-container || true
-            docker run -d --name devsecops-container -p 3000:3000 devsecops-app
-            '''
+   stage('6 - Deploy Application Container') {
+    steps {
+        sh '''
+        docker rm -f devsecops-container || true
+        docker run -d \
+          --name devsecops-container \
+          --restart unless-stopped \
+          -p 3000:3000 \
+          devsecops-app
+        '''
         }
     }
 
