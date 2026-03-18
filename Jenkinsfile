@@ -40,18 +40,24 @@ stages {
         }
     }
 
-   stage('6 - Deploy Application Container') {
+   stage('6 - Deploy on EC2') {
     steps {
         sh '''
+        ssh -o StrictHostKeyChecking=no \
+        -i /home/penguinlord/security.pem \
+        ec2-user@18.212.253.97 << EOF
+
+        cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
+        cd DevSecOps_project
+
         docker rm -f devsecops-container || true
-        docker run -d \
-          --name devsecops-container \
-          --restart unless-stopped \
-          -p 3000:3000 \
-          devsecops-app
+        docker build -t devsecops-app .
+        docker run -d --restart unless-stopped -p 3000:3000 devsecops-app
+
+        EOF
         '''
-        }
     }
+}
 
     stage('7 - Verify Deployment') {
         steps {
