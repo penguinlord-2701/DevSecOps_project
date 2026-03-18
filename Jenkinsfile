@@ -43,13 +43,18 @@ stages {
    stage('6 - Deploy on EC2') {
     steps {
         sh '''
-        ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/security.pem ec2-user@18.212.253.97 "
-        cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git &&
-        cd DevSecOps_project &&
-        docker rm -f devsecops-container || true &&
-        docker build -t devsecops-app . &&
+        ssh -o StrictHostKeyChecking=no \
+        -i /var/lib/jenkins/security.pem \
+        ec2-user@18.212.253.97 <<'EOF'
+
+        ls ||cd DevSecOps_project || git clone https://github.com/penguinlord-2701/DevSecOps_project.git
+        cd DevSecOps_project
+
+        docker rm -f devsecops-container || true
+        docker build -t devsecops-app .
         docker run -d --restart unless-stopped -p 3000:3000 devsecops-app
-        "
+
+        EOF
         '''
     }
 }
